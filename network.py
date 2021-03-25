@@ -83,9 +83,13 @@ class NeuralNetwork:
         for l in reversed(range(len(self.values))):
             if l > 0:
                 for n in range(len(self.values[l])):
+                    for b in range(len(self.values[l-1])):
+                        ## calc bias cost
+                        self.biases_changes[l-1][b].append(learn_rate * (derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-expexted_out_layer[n])))
                     for w in range(len(self.weights[l][n])):
                         ## calc cost
-                        self.weights_changes.append(learn_rate * (self.values[l-1][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-expexted_out_layer[n])))
+                        self.weights_changes[l][n][w].append(learn_rate * (self.values[l-1][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-expexted_out_layer[n])))
+                
 
 
     def add_avr_change_to_weigths_and_biases(self):
