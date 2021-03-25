@@ -16,6 +16,16 @@ def derivitive_act_func(x):
     return 1 - ((math.tanh(x)) ** 2)
 
 
+def avvr_list(l):
+    if isinstance(l, list):
+        leng = len(l)
+        val = 0
+        for i in range(leng):
+            val += l[i]
+        return val/leng
+    return l
+
+
 class NeuralNetwork:
     def __init__(self, layers):
         self.values = []
@@ -24,10 +34,12 @@ class NeuralNetwork:
         self.biases = []
         self.weights_changes = []
         self.biases_changes = []
+        self.values_changes = []
         # setup layers
         for i in range(len(layers)):
             l = layers[i]
             layer = []
+            vc_layer = []
             layer_no_act = []
             w_layer = []
             b_layer = []
@@ -37,6 +49,7 @@ class NeuralNetwork:
                 # add base values
                 layer.append(0)
                 layer_no_act.append(0)
+                vc_layer.append([])
                 # add biases
                 b_layer.append(0)
                 bc_layer.append([])
@@ -53,6 +66,7 @@ class NeuralNetwork:
             self.weights_changes.append(wc_layer)
             self.biases_changes.append(bc_layer)
             self.values.append(layer)
+            self.values_changes.append(vc_layer)
             self.values_no_act_func.append(layer_no_act)
         
 
@@ -72,23 +86,26 @@ class NeuralNetwork:
                     self.values[l][n] = activation_function(self.values[l][n])
         return self.values[-1]
 
+
     def backprop_add_change(self, inp, expexted_out, learn_rate):
         out = self.forward(inp)
         cost = 0
         for i in range(len(out)):
             cost += (out[i] - expexted_out[i]) ** 2
 
-        expexted_out_layer = expexted_out
+        self.values_changes[len(self.values)-1] = expexted_out
         
         for l in reversed(range(len(self.values))):
             if l > 0:
                 for n in range(len(self.values[l])):
-                    for b in range(len(self.values[l-1])):
-                        ## calc bias cost
-                        self.biases_changes[l-1][b].append(learn_rate * (derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-expexted_out_layer[n])))
+                    ## calc cost bias
+                    self.biases_changes[l][n].append(learn_rate * (derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
                     for w in range(len(self.weights[l][n])):
                         ## calc cost
-                        self.weights_changes[l][n][w].append(learn_rate * (self.values[l-1][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-expexted_out_layer[n])))
+                        self.weights_changes[l][n][w].append(learn_rate * (self.values[l-1][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
+                        ## calc cost for previous neuron
+                        self.values_changes[l-1][w].append(learn_rate * (self.weights[l][n][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
+
                 
 
 
@@ -105,3 +122,5 @@ print(net.weights)
 print(net.forward([2,4,5]))
 print(net.values)
 print(net.forward([2,4,4]))
+print(net.forward([-2, -4,4]))
+net.backprop_add_change([1,2,4], [1,0,0], 0.01)
