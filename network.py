@@ -61,6 +61,7 @@ class NeuralNetwork:
                         w_layer_node.append(1)
                         wc_layer_node.append([])
                 w_layer.append(w_layer_node)
+                wc_layer.append(wc_layer_node)
             self.weights.append(w_layer)
             self.biases.append(b_layer)
             self.weights_changes.append(wc_layer)
@@ -99,18 +100,31 @@ class NeuralNetwork:
             if l > 0:
                 for n in range(len(self.values[l])):
                     ## calc cost bias
-                    self.biases_changes[l][n].append(learn_rate * (derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
+                    self.biases_changes[l][n].append(-learn_rate * (derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
                     for w in range(len(self.weights[l][n])):
                         ## calc cost
-                        self.weights_changes[l][n][w].append(learn_rate * (self.values[l-1][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
+                        self.weights_changes[l][n][w].append(-learn_rate * (self.values[l-1][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
                         ## calc cost for previous neuron
-                        self.values_changes[l-1][w].append(learn_rate * (self.weights[l][n][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
+                        self.values_changes[l-1][w].append(-learn_rate * (self.weights[l][n][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
 
-                
+    
+    def get_cost(self, inp, expexted_out):
+        out = self.forward(inp)
+        cost = 0
+        for i in range(len(out)):
+            cost += (out[i] - expexted_out[i]) ** 2
+        return cost
 
 
     def add_avr_change_to_weigths_and_biases(self):
-        pass
+        for l in range(len(self.values)):
+            if l > 0 :
+                for n in range(len(self.values[l])):
+                    self.biases[l][n] += avvr_list(self.biases_changes[l][n])
+                    self.biases_changes[l][n] = []
+                    for w in range(len(self.weights[l][n])):
+                        self.weights[l][n][w] += avvr_list(self.weights_changes[l][n][w])
+                        self.weights_changes[l][n][w] = []
 
 
     
@@ -123,4 +137,16 @@ print(net.forward([2,4,5]))
 print(net.values)
 print(net.forward([2,4,4]))
 print(net.forward([-2, -4,4]))
-net.backprop_add_change([1,2,4], [1,0,0], 0.01)
+print(net.get_cost([1,2,4], [1,0,0]))
+net.backprop_add_change([1,2,4], [1,0,0], 1)
+print(net.get_cost([1,2,4], [1,0,0]))
+net.backprop_add_change([1,2,4], [1,0,0], 1)
+net.add_avr_change_to_weigths_and_biases()
+print(net.get_cost([1,2,4], [1,0,0]))
+
+for i in range(10000):
+    net.backprop_add_change([1,2,4], [1,0,0], .1)
+    net.add_avr_change_to_weigths_and_biases()
+    print(net.get_cost([1,2,4], [1,0,0]))
+
+print(net.forward([1,2,4]))
