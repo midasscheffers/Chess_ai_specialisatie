@@ -88,7 +88,7 @@ class NeuralNetwork:
         return self.values[-1]
 
 
-    def backprop_add_change(self, inp, expexted_out, learn_rate):
+    def backprop(self, inp, expexted_out, learn_rate):
         out = self.forward(inp)
         cost = 0
         for i in range(len(out)):
@@ -126,27 +126,19 @@ class NeuralNetwork:
                         self.weights[l][n][w] += avvr_list(self.weights_changes[l][n][w])
                         self.weights_changes[l][n][w] = []
 
+    
+    def train(self, data, learn_rate):
+        for i in range(len(data)):
+            self.backprop(data[i][0], data[i][1], learn_rate)
+        self.add_avr_change_to_weigths_and_biases()
+
 
     
 
 net = NeuralNetwork([3, 1, 3])
-print(net.values)
-print(net.biases)
-print(net.weights)
-print(net.forward([2,4,5]))
-print(net.values)
-print(net.forward([2,4,4]))
-print(net.forward([-2, -4,4]))
-print(net.get_cost([1,2,4], [1,0,0]))
-net.backprop_add_change([1,2,4], [1,0,0], 1)
-print(net.get_cost([1,2,4], [1,0,0]))
-net.backprop_add_change([1,2,4], [1,0,0], 1)
-net.add_avr_change_to_weigths_and_biases()
-print(net.get_cost([1,2,4], [1,0,0]))
+dat = [[[-2,-4,4], [1,0,0]]]
 
-for i in range(10000):
-    net.backprop_add_change([1,2,4], [1,0,0], .1)
-    net.add_avr_change_to_weigths_and_biases()
-    print(net.get_cost([1,2,4], [1,0,0]))
+for i in range(5000):
+    net.train(dat, .1)
 
-print(net.forward([1,2,4]))
+print(net.get_cost([-2,-4,4], [1,0,0]))
