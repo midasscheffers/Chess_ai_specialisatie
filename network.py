@@ -131,14 +131,3 @@ class NeuralNetwork:
         for i in range(len(data)):
             self.backprop(data[i][0], data[i][1], learn_rate)
         self.add_avr_change_to_weigths_and_biases()
-
-
-    
-
-net = NeuralNetwork([3, 1, 3])
-dat = [[[-2,-4,4], [1,0,0]]]
-
-for i in range(5000):
-    net.train(dat, .1)
-
-print(net.get_cost([-2,-4,4], [1,0,0]))
