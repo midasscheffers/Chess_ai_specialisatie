@@ -22,11 +22,24 @@ class ChessData:
         for i in range(size):
             b = self.random_board()
             limit = chess.engine.Limit(time=time_limit)
-            print(self.engine.play(b,limit), self.engine.play(b,limit).move)
             data.append([b, self.engine.play(b,limit).move])
+        return data
+    
+
+    def stockfish_score(self, board, depth):
+        result = self.engine.analyse(board, chess.engine.Limit(depth=depth))
+        score = result['score'].white().score()
+        return score
+    
+    def move_to_ai_out(self, move):
+        pass
+
+    def board_to_ai_inp(self, board):
+        pass
 
 
 dataGen = ChessData()
 
 data = dataGen.randomData(10)
 print(data)
+dataGen.engine.quit()
