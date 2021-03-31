@@ -9,8 +9,8 @@ dataGen = ChessData()
 net = NeuralNetwork([64, 20, 20, 64])
 
 while True:
-    data = dataGen.randomData(100)
-    net.train(data, .1)
+    data = dataGen.randomData(10)
+    net.train(data, 1)
     testData = dataGen.randomData(1)
     print(net.get_cost(testData[0][0], testData[0][1]))
 
