@@ -3,6 +3,7 @@ import chess.engine
 import random as r
 
 piece_val_table = {"k":1.0, "q":0.7, "r":0.5, "b":0.3, "n":0.2, "p":0.1, ".":0.0, "K":-1.0, "Q":-0.7, "R":-0.5, "B":-0.3, "N":-0.2, "P":-0.1}
+alfabet = ["a","b","c","d","e","f","g","h"]
 
 class ChessData:
     def __init__(self):
@@ -39,7 +40,18 @@ class ChessData:
     
     def move_to_ai_out(self, move):
         m = str(move)
+        if m == "None":
+            return [0 for i in range(64)]
+        out_1 = int(alfabet.index(m[0])) * 8 + int(m[1])
+        out_2 = int(alfabet.index(m[2])) * 8 + int(m[3])
         out = []
+        for i in range(64):
+            if i == out_1:
+                out.append(1)
+            elif i == out_2:
+                out.append(.8)
+            else:
+                out.append(0)
         return out
 
     def board_to_ai_inp(self, board):
@@ -51,8 +63,3 @@ class ChessData:
         return inp
 
 
-dataGen = ChessData()
-
-data = dataGen.randomData(10)
-print(data)
-dataGen.engine.quit()
