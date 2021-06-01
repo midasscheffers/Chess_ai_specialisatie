@@ -11,13 +11,18 @@ class ChessData:
 
     def random_board(self, max_depth=200):
         board = chess.Board()
-        depth = r.randrange(0, max_depth)
+        depth = 3
+        if r.randint(0,1) == 1:
+            depth = r.randrange(0, max_depth)
+        else:
+            depth = r.randrange(0, 10)
         for _ in range(depth):
             all_moves = list(board.legal_moves)
             random_move = r.choice(all_moves)
             board.push(random_move)
             if board.is_game_over():
                 break
+        
         return board
     
     def randomData(self, size, time_limit=0.1):
@@ -40,10 +45,11 @@ class ChessData:
     
     def move_to_ai_out(self, move):
         m = str(move)
+        print(m)
         if m == "None":
             return [0 for i in range(64)]
-        out_1 = int(alfabet.index(m[0])) * 8 + int(m[1])
-        out_2 = int(alfabet.index(m[2])) * 8 + int(m[3])
+        out_1 = int(alfabet.index(m[0])) * 8 + (int(m[1]) - 1)
+        out_2 = int(alfabet.index(m[2])) * 8 + (int(m[3]) - 1)
         out = []
         for i in range(64):
             if i == out_1:

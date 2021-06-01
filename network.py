@@ -1,5 +1,5 @@
 import math
-
+import os
 
 def dot_mult_array(a1, a2):
     result = 0
@@ -28,6 +28,50 @@ def avvr_list(l):
 
 class NeuralNetwork:
     def __init__(self, layers):
+        self.values = []
+        self.values_no_act_func = []
+        self.weights = []
+        self.biases = []
+        self.weights_changes = []
+        self.biases_changes = []
+        self.values_changes = []
+        # setup layers
+        for i in range(len(layers)):
+            l = layers[i]
+            layer = []
+            vc_layer = []
+            layer_no_act = []
+            w_layer = []
+            b_layer = []
+            wc_layer = []
+            bc_layer = []
+            for j in range(l):
+                # add base values
+                layer.append(0)
+                layer_no_act.append(0)
+                vc_layer.append([])
+                # add biases
+                b_layer.append(0)
+                bc_layer.append([])
+                w_layer_node = []
+                wc_layer_node = []
+                if not i == 0:
+                    for k in range(layers[i-1]):
+                        # add weights
+                        w_layer_node.append(1)
+                        wc_layer_node.append([])
+                w_layer.append(w_layer_node)
+                wc_layer.append(wc_layer_node)
+            self.weights.append(w_layer)
+            self.biases.append(b_layer)
+            self.weights_changes.append(wc_layer)
+            self.biases_changes.append(bc_layer)
+            self.values.append(layer)
+            self.values_changes.append(vc_layer)
+            self.values_no_act_func.append(layer_no_act)
+    
+
+    def reset(self, layers):
         self.values = []
         self.values_no_act_func = []
         self.weights = []
@@ -131,3 +175,70 @@ class NeuralNetwork:
         for i in range(len(data)):
             self.backprop(data[i][0], data[i][1], learn_rate)
         self.add_avr_change_to_weigths_and_biases()
+    
+
+    def save_to_file(self, file_name):
+        if os.path.exists(file_name):
+            os.remove(file_name)
+        f = open(file_name, "x+")
+        f.truncate(0)
+        layer_str = ""
+        for l in self.values:
+            leng = len(l)
+            layer_str += f',{leng}'
+        f.write(f"{layer_str}\n:\n")
+        for l in range(len(self.weights)):
+            weights_str, bias_str = "", ""
+            for n in range(len(self.weights[l])):
+                bias_str += f",{self.biases[l][n]}"
+                for w in range(len(self.weights[l][n])):
+                    weights_str += f",{self.weights[l][n][w]}"
+                weights_str += "%"
+            f.write(f"{weights_str}&{bias_str}\n")
+        f.close()
+
+
+    def load_from_file(self, file_name):
+        f = open(file_name, "r")
+        data = f.read()
+        data = data.split("\n:\n")
+        data[0] = data[0].split(',')[1:]
+        data[0] = [int(s) for s in data[0]]
+        self.reset(data[0])
+        data = data[1].split("\n")
+        data = [d.split("&") for d in data]
+        data = [[s.split("%") for s in d] for d in data]
+        for l in range(len(data)):
+            for p in range(len(data[l])):
+                p_d = data[l][p]
+                p_d = [i for i in p_d if not i == ""]
+                for s in range(len(p_d)):
+                    p_d[s] = p_d[s].split(',')
+                p_d = [[i for i in c if not i == ""] for c in p_d]
+                data[l][p] = p_d
+        for l in range(len(self.weights)):
+            if l > 0:
+                for p in range(len(data[l])):
+                    if p == 1:
+                        for n in range(len(data[l][p][0])):
+                            self.biases[l][n] = float(data[l][p][0][n])
+                    elif p == 0:
+                        for n in range(len(data[l][p])):
+                            for w in range(len(data[l][p][n])):
+                                self.weights[l][n][w] = float(data[l][p][n][w])
+    
+    def ai_to_move_out(self, out):
+        print(out)
+        if out == "None":
+            return [0 for i in range(64)]
+        out_1 = int(alfabet.index(m[0])) * 8 + (int(m[1]) - 1)
+        out_2 = int(alfabet.index(m[2])) * 8 + (int(m[3]) - 1)
+        out = []
+        for i in range(64):
+            if i == out_1:
+                out.append(1)
+            elif i == out_2:
+                out.append(.8)
+            else:
+                out.append(0)
+        return out
