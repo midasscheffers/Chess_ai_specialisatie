@@ -7,7 +7,7 @@ from get_data import *
 
 
 net = NeuralNetwork([64, 100, 50, 20, 64])
-net.load_from_file("tester.nw")
+net.load_from_file("main.nw")
 
 bord = chess.Board()
 
