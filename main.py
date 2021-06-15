@@ -10,13 +10,14 @@ dataGen = ChessData()
 net = NeuralNetwork([64, 100, 50, 20, 64])
 net.load_from_file("tester.nw")
 
-cycles = 100
+cycles = 10
 
 for i in range(cycles):
-    data = dataGen.randomData(10)
-    net.train(data, .1)
+    data = dataGen.randomData(50)
+    net.train(data, .01)
     testData = dataGen.randomData(1)
-    print(net.get_cost(testData[0][0], testData[0][1]))
+    print(i, net.get_cost(testData[0][0], testData[0][1]))
+    net.save_to_file("tester.nw")
 
 ## test file making
 # net = NeuralNetwork([3, 4, 3, 2])

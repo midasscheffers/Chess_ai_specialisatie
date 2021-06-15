@@ -1,6 +1,8 @@
 import math
 import os
 
+piece_val_table = {"k":1.0, "q":0.7, "r":0.5, "b":0.3, "n":0.2, "p":0.1, ".":0.0, "K":-1.0, "Q":-0.7, "R":-0.5, "B":-0.3, "N":-0.2, "P":-0.1}
+
 def dot_mult_array(a1, a2):
     result = 0
     for i in range(len(a1)):
@@ -229,16 +231,22 @@ class NeuralNetwork:
     
     def ai_to_move_out(self, out):
         print(out)
+        alfabet = ["a", "b", "c", "d", "e", "f", "g", "h"]
+        temp = ""
         if out == "None":
-            return [0 for i in range(64)]
-        out_1 = int(alfabet.index(m[0])) * 8 + (int(m[1]) - 1)
-        out_2 = int(alfabet.index(m[2])) * 8 + (int(m[3]) - 1)
-        out = []
-        for i in range(64):
-            if i == out_1:
-                out.append(1)
-            elif i == out_2:
-                out.append(.8)
-            else:
-                out.append(0)
+            return temp
         return out
+
+
+    def board_to_ai_inp(self, board):
+        piece_val_table = {"k":1.0, "q":0.7, "r":0.5, "b":0.3, "n":0.2, "p":0.1, ".":0.0, "K":-1.0, "Q":-0.7, "R":-0.5, "B":-0.3, "N":-0.2, "P":-0.1}
+        b = str(board)
+        inp = []
+        for i in range(len(b)):
+            if b[i] in piece_val_table:
+                inp.append(piece_val_table[b[i]])
+        return inp
+
+    def get_ai_out_from_bord(self, bord_state):
+        out = self.forward(self.board_to_ai_inp(bord_state))
+        return self.ai_to_move_out(out)
