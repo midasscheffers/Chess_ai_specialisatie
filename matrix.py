@@ -33,17 +33,16 @@ class Matrix:
     @staticmethod
     def add(a, b):
         if isinstance(b, Matrix):
-            b_trans = b.transpose()
             result = Matrix(a.height, b.width)
             for i in range(result.height):
                 for j in range(result.width):
-                    result.A[i][j] = dot_mult_array(a.A[i], b_trans.A[j])
+                    result.A[i][j] = a.A[i][j] + b.A[i][j]
             return result
         else:
             result = Matrix(a.height, a.width)
             for i in range(result.height):
                 for j in range(result.width):
-                    result.A[i][j] = a.A[i][j] * b
+                    result.A[i][j] = a.A[i][j] + b
             return result
     
     @staticmethod
@@ -62,3 +61,10 @@ class Matrix:
             for j in range(trans.width):
                 trans.A[i][j] = self.A[j][i]
         return trans
+    
+    def map(a, func):
+        result = Matrix(a.height, a.width)
+        for i in range(result.height):
+            for j in range(result.width):
+                result.A[i][j] = func(a.A[i][j])
+        return result
