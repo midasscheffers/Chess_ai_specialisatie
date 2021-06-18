@@ -1,5 +1,6 @@
 import math
 import os
+from matrix import *
 
 piece_val_table = {"k":1.0, "q":0.7, "r":0.5, "b":0.3, "n":0.2, "p":0.1, ".":0.0, "K":-1.0, "Q":-0.7, "R":-0.5, "B":-0.3, "N":-0.2, "P":-0.1}
 
@@ -30,108 +31,123 @@ def avvr_list(l):
 
 class NeuralNetwork:
     def __init__(self, layers):
-        self.values = []
-        self.values_no_act_func = []
-        self.weights = []
-        self.biases = []
-        self.weights_changes = []
-        self.biases_changes = []
-        self.values_changes = []
-        # setup layers
-        for i in range(len(layers)):
-            l = layers[i]
-            layer = []
-            vc_layer = []
-            layer_no_act = []
-            w_layer = []
-            b_layer = []
-            wc_layer = []
-            bc_layer = []
-            for j in range(l):
-                # add base values
-                layer.append(0)
-                layer_no_act.append(0)
-                vc_layer.append([])
-                # add biases
-                b_layer.append(0)
-                bc_layer.append([])
-                w_layer_node = []
-                wc_layer_node = []
-                if not i == 0:
-                    for k in range(layers[i-1]):
-                        # add weights
-                        w_layer_node.append(1)
-                        wc_layer_node.append([])
-                w_layer.append(w_layer_node)
-                wc_layer.append(wc_layer_node)
-            self.weights.append(w_layer)
-            self.biases.append(b_layer)
-            self.weights_changes.append(wc_layer)
-            self.biases_changes.append(bc_layer)
-            self.values.append(layer)
-            self.values_changes.append(vc_layer)
-            self.values_no_act_func.append(layer_no_act)
+        self.values = [Matrix(layers[i], 1) for i in range(len(layers))]
+        self.weights = [Matrix.random_matrix(layers[i+1], layers[i]) for i in range(len(layers)) if (i+1 < len(layers)) ]
+        self.biases = [Matrix.random_matrix(layers[i], 1) for i in range(len(layers))]
+        self.size = layers
+        # self.values = []
+        # self.values_no_act_func = []
+        # self.weights = []
+        # self.biases = []
+        # self.weights_changes = []
+        # self.biases_changes = []
+        # self.values_changes = []
+        # # setup layers
+        # for i in range(len(layers)):
+        #     l = layers[i]
+        #     layer = []
+        #     vc_layer = []
+        #     layer_no_act = []
+        #     w_layer = []
+        #     b_layer = []
+        #     wc_layer = []
+        #     bc_layer = []
+        #     for j in range(l):
+        #         # add base values
+        #         layer.append(0)
+        #         layer_no_act.append(0)
+        #         vc_layer.append([])
+        #         # add biases
+        #         b_layer.append(0)
+        #         bc_layer.append([])
+        #         w_layer_node = []
+        #         wc_layer_node = []
+        #         if not i == 0:
+        #             for k in range(layers[i-1]):
+        #                 # add weights
+        #                 w_layer_node.append(1)
+        #                 wc_layer_node.append([])
+        #         w_layer.append(w_layer_node)
+        #         wc_layer.append(wc_layer_node)
+        #     self.weights.append(w_layer)
+        #     self.biases.append(b_layer)
+        #     self.weights_changes.append(wc_layer)
+        #     self.biases_changes.append(bc_layer)
+        #     self.values.append(layer)
+        #     self.values_changes.append(vc_layer)
+        #     self.values_no_act_func.append(layer_no_act)
     
 
     def reset(self, layers):
-        self.values = []
-        self.values_no_act_func = []
-        self.weights = []
-        self.biases = []
-        self.weights_changes = []
-        self.biases_changes = []
-        self.values_changes = []
-        # setup layers
-        for i in range(len(layers)):
-            l = layers[i]
-            layer = []
-            vc_layer = []
-            layer_no_act = []
-            w_layer = []
-            b_layer = []
-            wc_layer = []
-            bc_layer = []
-            for j in range(l):
-                # add base values
-                layer.append(0)
-                layer_no_act.append(0)
-                vc_layer.append([])
-                # add biases
-                b_layer.append(0)
-                bc_layer.append([])
-                w_layer_node = []
-                wc_layer_node = []
-                if not i == 0:
-                    for k in range(layers[i-1]):
-                        # add weights
-                        w_layer_node.append(1)
-                        wc_layer_node.append([])
-                w_layer.append(w_layer_node)
-                wc_layer.append(wc_layer_node)
-            self.weights.append(w_layer)
-            self.biases.append(b_layer)
-            self.weights_changes.append(wc_layer)
-            self.biases_changes.append(bc_layer)
-            self.values.append(layer)
-            self.values_changes.append(vc_layer)
-            self.values_no_act_func.append(layer_no_act)
+        self.values = [Matrix(layers[i], 1) for i in range(len(layers))]
+        self.weights = [Matrix.random_matrix(layers[i+1], layers[i]) for i in range(len(layers)) if (i+1 < len(layers)) ]
+        self.biases = [Matrix.random_matrix(layers[i], 1) for i in range(len(layers))]
+        self.size = layers
+        # self.values = []
+        # self.values_no_act_func = []
+        # self.weights = []
+        # self.biases = []
+        # self.weights_changes = []
+        # self.biases_changes = []
+        # self.values_changes = []
+        # # setup layers
+        # for i in range(len(layers)):
+        #     l = layers[i]
+        #     layer = []
+        #     vc_layer = []
+        #     layer_no_act = []
+        #     w_layer = []
+        #     b_layer = []
+        #     wc_layer = []
+        #     bc_layer = []
+        #     for j in range(l):
+        #         # add base values
+        #         layer.append(0)
+        #         layer_no_act.append(0)
+        #         vc_layer.append([])
+        #         # add biases
+        #         b_layer.append(0)
+        #         bc_layer.append([])
+        #         w_layer_node = []
+        #         wc_layer_node = []
+        #         if not i == 0:
+        #             for k in range(layers[i-1]):
+        #                 # add weights
+        #                 w_layer_node.append(1)
+        #                 wc_layer_node.append([])
+        #         w_layer.append(w_layer_node)
+        #         wc_layer.append(wc_layer_node)
+        #     self.weights.append(w_layer)
+        #     self.biases.append(b_layer)
+        #     self.weights_changes.append(wc_layer)
+        #     self.biases_changes.append(bc_layer)
+        #     self.values.append(layer)
+        #     self.values_changes.append(vc_layer)
+        #     self.values_no_act_func.append(layer_no_act)
         
 
     def forward(self, inp):
-        if len(inp) == len(self.values[0]):
-            self.values[0] = inp
+        if len(inp) == len(self.values[0].A):
+            for i in range(self.values[0].height):
+                self.values[0].A[i][0] = inp[i]
         else:
             print("input should be as long as first layer")
             return None
         
-        for l in range(len(self.values)):
-            if l > 0:
-                for n in range(len(self.values[l])):
-                    self.values[l][n] = dot_mult_array(self.weights[l][n], self.values[l-1])
-                    self.values[l][n] += self.biases[l][n]
-                    self.values_no_act_func[l][n] = self.values[l][n]
-                    self.values[l][n] = activation_function(self.values[l][n])
-        return self.values[-1]
+        for i in range(len(self.weights)):
+            self.values[i+1] = Matrix.mult(self.weights[i], self.values[i])
+            self.values[i+1] = Matrix.add(self.values[i+1], self.biases[i+1])
+            self.values[i+1] = self.values[i+1].map(activation_function)
+
+        return self.values[-1].A
+        # for l in range(len(self.values)):
+        #     if l > 0:
+        #         for n in range(len(self.values[l])):
+        #             self.values[l][n] = dot_mult_array(self.weights[l][n], self.values[l-1])
+        #             self.values[l][n] += self.biases[l][n]
+        #             self.values_no_act_func[l][n] = self.values[l][n]
+        #             self.values[l][n] = activation_function(self.values[l][n])
+        # return self.values[-1]
 
 
     def backprop(self, inp, expexted_out, learn_rate):
@@ -185,18 +201,30 @@ class NeuralNetwork:
         f = open(file_name, "x+")
         f.truncate(0)
         layer_str = ""
-        for l in self.values:
-            leng = len(l)
-            layer_str += f',{leng}'
+        for l in self.size:
+            layer_str += f',{l}'
         f.write(f"{layer_str}\n:\n")
-        for l in range(len(self.weights)):
+        for l in range(len(self.biases)):
             weights_str, bias_str = "", ""
-            for n in range(len(self.weights[l])):
-                bias_str += f",{self.biases[l][n]}"
-                for w in range(len(self.weights[l][n])):
-                    weights_str += f",{self.weights[l][n][w]}"
-                weights_str += "%"
+            if l == 0:
+                weights_str = "%"
+            else:
+                for i in range(self.weights[l-1].height):
+                    for j in range(self.weights[l-1].width):
+                        weights_str += f",{self.weights[l-1].A[i][j]}"
+                    weights_str += "%"
+            for i in range(self.biases[l].height):
+               bias_str += f",{self.biases[l].A[i][0]}"
+
             f.write(f"{weights_str}&{bias_str}\n")
+        # for l in range(len(self.weights)):
+        #     weights_str, bias_str = "", ""
+        #     for n in range(len(self.weights[l].A)):
+        #         bias_str += f",{self.biases[l].A[n][0]}"
+        #         for w in range(len(self.weights[l].A[n])):
+        #             weights_str += f",{self.weights[l].A[n][w]}"
+        #         weights_str += "%"
+        #     f.write(f"{weights_str}&{bias_str}\n")
         f.close()
 
 
@@ -218,16 +246,24 @@ class NeuralNetwork:
                     p_d[s] = p_d[s].split(',')
                 p_d = [[i for i in c if not i == ""] for c in p_d]
                 data[l][p] = p_d
+        print(data)
         for l in range(len(self.weights)):
-            if l > 0:
-                for p in range(len(data[l])):
-                    if p == 1:
-                        for n in range(len(data[l][p][0])):
-                            self.biases[l][n] = float(data[l][p][0][n])
-                    elif p == 0:
-                        for n in range(len(data[l][p])):
-                            for w in range(len(data[l][p][n])):
-                                self.weights[l][n][w] = float(data[l][p][n][w])
+            for i in range(self.weights[l].height):
+                for j in range(self.weights[l].width):
+                    self.weights[l].A[i][j] = float(data[l+1][0][i][j])
+        for l in range(len(self.biases)):
+            for i in range(self.biases[l].height):
+                self.biases[l].A[i][0] = float(data[l][1][0][i])
+        # for l in range(len(self.weights)):
+        #     if l > 0:
+        #         for p in range(len(data[l])):
+        #             if p == 1:
+        #                 for n in range(len(data[l][p][0])):
+        #                     self.biases[l][n] = float(data[l][p][0][n])
+        #             elif p == 0:
+        #                 for n in range(len(data[l][p])):
+        #                     for w in range(len(data[l][p][n])):
+        #                         self.weights[l][n][w] = float(data[l][p][n][w])
     
     def ai_to_move_out(self, out):
         print(out)

@@ -1,4 +1,5 @@
 from matrix import *
+import math
 
 
 mat = Matrix(4,1)
@@ -31,7 +32,10 @@ print(Matrix.random_matrix(10,1).A)
 def add_one(a):
     return a + 1
 
-nat = tat.map(add_one)
+def activation_function(x):
+    return math.tanh(x)
+
+nat = tat.map(activation_function)
 print(nat.A)
 
 # li = [3,4,5]
