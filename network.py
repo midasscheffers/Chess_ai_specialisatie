@@ -34,6 +34,7 @@ class NeuralNetwork:
         self.values = [Matrix(layers[i], 1) for i in range(len(layers))]
         self.weights = [Matrix.random_matrix(layers[i+1], layers[i]) for i in range(len(layers)) if (i+1 < len(layers)) ]
         self.biases = [Matrix.random_matrix(layers[i], 1) for i in range(len(layers))]
+        self.error = [Matrix(layers[i], 1) for i in range(len(layers))]
         self.size = layers
         # self.values = []
         # self.values_no_act_func = []
@@ -82,6 +83,7 @@ class NeuralNetwork:
         self.values = [Matrix(layers[i], 1) for i in range(len(layers))]
         self.weights = [Matrix.random_matrix(layers[i+1], layers[i]) for i in range(len(layers)) if (i+1 < len(layers)) ]
         self.biases = [Matrix.random_matrix(layers[i], 1) for i in range(len(layers))]
+        self.error = [Matrix(layers[i], 1) for i in range(len(layers))]
         self.size = layers
         # self.values = []
         # self.values_no_act_func = []
@@ -151,23 +153,41 @@ class NeuralNetwork:
 
 
     def backprop(self, inp, expexted_out, learn_rate):
-        out = self.forward(inp)
-        cost = 0
-        for i in range(len(out)):
-            cost += (out[i] - expexted_out[i]) ** 2
-
-        self.values_changes[len(self.values)-1] = expexted_out
+        if len(inp) == len(self.values[0].A):
+            for i in range(self.values[0].height):
+                self.values[0].A[i][0] = inp[i]
+        else:
+            print("input should be as long as first layer")
+            return None
         
-        for l in reversed(range(len(self.values))):
-            if l > 0:
-                for n in range(len(self.values[l])):
-                    ## calc cost bias
-                    self.biases_changes[l][n].append(-learn_rate * (derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
-                    for w in range(len(self.weights[l][n])):
-                        ## calc cost
-                        self.weights_changes[l][n][w].append(-learn_rate * (self.values[l-1][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
-                        ## calc cost for previous neuron
-                        self.values_changes[l-1][w].append(-learn_rate * (self.weights[l][n][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
+        for i in range(len(self.weights)):
+            self.values[i+1] = Matrix.mult(self.weights[i], self.values[i])
+            self.values[i+1] = Matrix.add(self.values[i+1], self.biases[i+1])
+            self.values[i+1] = self.values[i+1].map(activation_function)
+
+        self.error[-1] = Matrix.subtract(Matrix.from_array(expexted_out), self.values[-1])
+        for i in reversed(range(len(self.weights))):
+            self.error[i] = Matrix.mult(self.weights[i].transpose(), self.error[i+1])
+        
+        print(self.values[-2].A, expexted_out, self.error[-2].A)
+
+        # out = self.forward(inp)
+        # cost = 0
+        # for i in range(len(out)):
+        #     cost += (out[i] - expexted_out[i]) ** 2
+
+        # self.values_changes[len(self.values)-1] = expexted_out
+        
+        # for l in reversed(range(len(self.values))):
+        #     if l > 0:
+        #         for n in range(len(self.values[l])):
+        #             ## calc cost bias
+        #             self.biases_changes[l][n].append(-learn_rate * (derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
+        #             for w in range(len(self.weights[l][n])):
+        #                 ## calc cost
+        #                 self.weights_changes[l][n][w].append(-learn_rate * (self.values[l-1][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
+        #                 ## calc cost for previous neuron
+        #                 self.values_changes[l-1][w].append(-learn_rate * (self.weights[l][n][w] * derivitive_act_func(self.values_no_act_func[l][n]) * 2 * (self.values[l][n]-avvr_list(self.values_changes[l][n]))))
 
     
     def get_cost(self, inp, expexted_out):

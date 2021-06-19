@@ -13,12 +13,11 @@ from network import *
 
 
  ## test backprop 2
-# net = NeuralNetwork([3, 2, 2])
-# print(net.forward([1, 3,4]))
-# dat = [[[-2,-4,4], [1,0,0]], [[-3,-5,4], [0,1,0]]]
+net = NeuralNetwork([3, 2, 2])
+dat = [[-2,-4,4], [1,0]]
 
-# for i in range(1000):
-#     net.train(dat, .1)
+for i in range(1000):
+    net.backprop(dat[0], dat[1], .1)
 
 # print(net.get_cost([-2,-4,4], [1,0,0]))
 # print(net.get_cost([-3,-5,4], [0,1,0]))
@@ -28,7 +27,7 @@ from network import *
 
 # test fle load
 
-net = NeuralNetwork([2, 3, 1])
-net.load_from_file("example_save.nw")
+# net = NeuralNetwork([2, 3, 1])
+# net.load_from_file("example_save.nw")
 
-net.save_to_file("example_save.nw")
+# net.save_to_file("example_save.nw")
