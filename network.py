@@ -153,6 +153,7 @@ class NeuralNetwork:
 
 
     def backprop(self, inp, expexted_out, learn_rate):
+        #feed forward
         if len(inp) == len(self.values[0].A):
             for i in range(self.values[0].height):
                 self.values[0].A[i][0] = inp[i]
@@ -165,11 +166,19 @@ class NeuralNetwork:
             self.values[i+1] = Matrix.add(self.values[i+1], self.biases[i+1])
             self.values[i+1] = self.values[i+1].map(activation_function)
 
+
+        #get errors for all value layers
         self.error[-1] = Matrix.subtract(Matrix.from_array(expexted_out), self.values[-1])
         for i in reversed(range(len(self.weights))):
             self.error[i] = Matrix.mult(self.weights[i].transpose(), self.error[i+1])
         
-        print(self.values[-2].A, expexted_out, self.error[-2].A)
+
+        delta_weights = [None for _ in range(len(self.weights))]
+        for i in range(len(self.weights)):
+            delta_weights[i] = Matrix.mult(self.error[i+1], self.values[i].transpose())
+            delta_weights[i] = Matrix.mult(delta_weights[i], learn_rate)
+            self.weights[i] = Matrix.add(self.weights[i], delta_weights[i])
+
 
         # out = self.forward(inp)
         # cost = 0
@@ -194,7 +203,7 @@ class NeuralNetwork:
         out = self.forward(inp)
         cost = 0
         for i in range(len(out)):
-            cost += (out[i] - expexted_out[i]) ** 2
+            cost += (out[i][0] - expexted_out[i]) ** 2
         return cost
 
 
@@ -212,7 +221,7 @@ class NeuralNetwork:
     def train(self, data, learn_rate):
         for i in range(len(data)):
             self.backprop(data[i][0], data[i][1], learn_rate)
-        self.add_avr_change_to_weigths_and_biases()
+        # self.add_avr_change_to_weigths_and_biases()
     
 
     def save_to_file(self, file_name):

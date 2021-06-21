@@ -13,12 +13,12 @@ net = NeuralNetwork([64, 20, 60, 10, 64])
 
 net.load_from_file(file_name)
 
-cycles = 1000
-batch_size = 1
+cycles = 10
+batch_size = 100
 
 for i in range(cycles):
     data = dataGen.randomData(batch_size)
-    net.train(data, .1)
+    net.train(data, .01)
     testData = dataGen.randomData(1)
     print(i, net.get_cost(testData[0][0], testData[0][1]))
     net.save_to_file(file_name)
