@@ -29,8 +29,6 @@ def random_board(max_depth=200):
         return board
 
 
-print(bord)
 bord = random_board()
 print(bord)
-print(net.board_to_ai_inp(bord))
-print(net.forward(net.board_to_ai_inp(bord)))
+print(net.get_ai_out_from_bord(bord))

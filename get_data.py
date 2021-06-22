@@ -11,11 +11,12 @@ class ChessData:
 
     def random_board(self, max_depth=200):
         board = chess.Board()
-        depth = 3
-        if r.randint(0,1) == 1:
-            depth = r.randrange(0, max_depth)
-        else:
-            depth = r.randrange(0, 10)
+        depth = r.randrange(0, max_depth)
+        # depth = 3
+        # if r.randint(0,1) == 1:
+        #     depth = r.randrange(0, max_depth)
+        # else:
+        #     depth = r.randrange(0, 10)
         for _ in range(depth):
             all_moves = list(board.legal_moves)
             random_move = r.choice(all_moves)

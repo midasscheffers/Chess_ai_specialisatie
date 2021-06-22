@@ -1,6 +1,8 @@
 import math
+import numpy as np
 import os
 from matrix import *
+import copy
 
 piece_val_table = {"k":1.0, "q":0.7, "r":0.5, "b":0.3, "n":0.2, "p":0.1, ".":0.0, "K":-1.0, "Q":-0.7, "R":-0.5, "B":-0.3, "N":-0.2, "P":-0.1}
 
@@ -11,12 +13,25 @@ def dot_mult_array(a1, a2):
     return result
 
 
-def activation_function(x):
-    return math.tanh(x)
+# tanh act funcs
+# def activation_function(x):
+#     return math.tanh(x)
     
+# def derivitive_act_func(x):
+#     return 1 - ((math.tanh(x)) ** 2)
 
+
+#sigmoid act func
+def activation_function(x):
+    sig = np.where(x < 0, np.exp(x)/(1 + np.exp(x)), 1/(1 + np.exp(-x)))
+    return sig
+    
 def derivitive_act_func(x):
-    return 1 - ((math.tanh(x)) ** 2)
+    sig_deriv = activation_function(x) * (1-activation_function(x))
+    return sig_deriv
+
+def dsigmoid(y):
+    return y * y-1
 
 
 def avvr_list(l):
@@ -166,20 +181,49 @@ class NeuralNetwork:
             self.values[i+1] = Matrix.add(self.values[i+1], self.biases[i+1])
             self.values[i+1] = self.values[i+1].map(activation_function)
 
+    # bigin backprop codingtrain style
 
-        #get errors for all value layers
         self.error[-1] = Matrix.subtract(Matrix.from_array(expexted_out), self.values[-1])
         for i in reversed(range(len(self.weights))):
             self.error[i] = Matrix.mult(self.weights[i].transpose(), self.error[i+1])
+        gradients = [Matrix(0,0) for _ in range(len(self.values))]
+        delta_w =  [Matrix(0,0) for _ in range(len(self.weights))]
+        for i in reversed(range(len(self.weights))):
+            gradients = Matrix.map(self.values[i+1], dsigmoid)
+            gradients = Matrix.mult(gradients, self.error[i+1])
+            gradients = Matrix.mult(gradients, learn_rate)
+            delta_w[i] = Matrix.mult(gradients, self.values[i].transpose())
+        #add changes
+        for i in range(len(self.weights)):
+            addition = delta_w[i]
+            self.weights[i] = Matrix.subtract(self.weights[i], addition)
+
+    # bigin backprop sirage style
+        # self.error[-1] = Matrix.subtract(Matrix.from_array(expexted_out), self.values[-1])
+        # delta_l = [Matrix(0,0) for _ in range(len(self.values))]
+        # for i in reversed(range(len(self.weights))):
+        #     delta_l[i+1] = Matrix.mult(self.error[i+1], Matrix.map(self.values[i+1], derivitive_act_func))
+        #     self.error[i] = Matrix.mult(delta_l[i+1], self.weights[i].transpose())
+        
+        # #add changes
+        # for i in range(len(self.weights)):
+        #     addition = Matrix.mult(Matrix.mult(self.values[i].transpose(), delta_l[i+1]), learn_rate)
+        #     self.weights[i] = Matrix.add(self.weights[i], addition)
+
+    #old code 2
+        #get errors for all value layers
+        # self.error[-1] = Matrix.subtract(Matrix.from_array(expexted_out), self.values[-1])
+        # for i in reversed(range(len(self.weights))):
+        #     self.error[i] = Matrix.mult(self.weights[i].transpose(), self.error[i+1])
         
 
-        delta_weights = [None for _ in range(len(self.weights))]
-        for i in range(len(self.weights)):
-            delta_weights[i] = Matrix.mult(self.error[i+1], self.values[i].transpose())
-            delta_weights[i] = Matrix.mult(delta_weights[i], learn_rate)
-            self.weights[i] = Matrix.add(self.weights[i], delta_weights[i])
+        # delta_weights = [None for _ in range(len(self.weights))]
+        # for i in range(len(self.weights)):
+        #     delta_weights[i] = Matrix.mult(self.error[i+1], self.values[i].transpose())
+        #     delta_weights[i] = Matrix.mult(delta_weights[i], learn_rate)
+        #     self.weights[i] = Matrix.add(self.weights[i], delta_weights[i])
 
-
+    ### old code
         # out = self.forward(inp)
         # cost = 0
         # for i in range(len(out)):
@@ -295,12 +339,22 @@ class NeuralNetwork:
         #                         self.weights[l][n][w] = float(data[l][p][n][w])
     
     def ai_to_move_out(self, out):
-        print(out)
         alfabet = ["a", "b", "c", "d", "e", "f", "g", "h"]
         temp = ""
         if out == "None":
             return temp
-        return out
+        biggest = max(out)
+        temp_max_rem = copy.deepcopy(out)
+        temp_max_rem.remove(max(temp_max_rem))
+        second_biggest = max(temp_max_rem)
+        inx_big = out.index(biggest)
+        inx_sec_big = out.index(second_biggest)
+        letter_big = alfabet[inx_big//8]
+        letter_sec_big = alfabet[inx_sec_big//8]
+        num_big = (inx_big%8)+1
+        num_sec_big = (inx_sec_big%8)+1
+        temp = letter_big + str(num_big) + letter_sec_big + str(num_sec_big)
+        return temp
 
 
     def board_to_ai_inp(self, board):
@@ -311,6 +365,7 @@ class NeuralNetwork:
             if b[i] in piece_val_table:
                 inp.append(piece_val_table[b[i]])
         return inp
+
 
     def get_ai_out_from_bord(self, bord_state):
         out = self.forward(self.board_to_ai_inp(bord_state))

@@ -16,7 +16,7 @@ from network import *
 net = NeuralNetwork([3, 2, 2])
 dat = [[[-2,-4,4], [1,0]], [[3,-5,2], [0,1]]]
 
-for i in range(1000):
+for i in range(10000):
     net.train(dat, .1)
 
 print(net.get_cost([-2,-4,4], [1,0]), net.forward([-2,-4,4]))
